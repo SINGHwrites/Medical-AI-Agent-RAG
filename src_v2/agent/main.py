@@ -1,39 +1,38 @@
-from pathlib import Path
-import sys
+from src_v2.retrieval.hybrid_retriever import hybrid_retrieve
+from src_v2.summarizer.summary_builder import build_summary
+from src_v2.llm.llm_rewriter import rewrite_summary
 
-if __package__ in (None, ""):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from src_v2.llm.llm_rewriter import rewrite_summary
-    from src_v2.retrieval.retriever import retrieve_patients
-    from src_v2.summarizer.summary_builder import build_summary
-else:
-    from ..llm.llm_rewriter import rewrite_summary
-    from ..retrieval.retriever import retrieve_patients
-    from ..summarizer.summary_builder import build_summary
+# QUESTION
+question = input("Ask medical query: ")
 
+# HYBRID RETRIEVAL
+df = hybrid_retrieve(question)
 
-def main() -> int:
-    question = input("Ask medical query: ").strip()
+# EMPTY RESULT CHECK
+if df.empty:
+    print("No matching patients found.")
+    exit()
 
-    if not question:
-        print("Please enter a medical query.")
-        return 1
+# STRUCTURED SUMMARY
+summary = build_summary(df)
 
-    df = retrieve_patients(question)
+# STRUCTURED ANSWER
+print("\n--- STRUCTURED ANSWER ---")
+print(f"Patients found: {summary['count']}")
+print(f"Age range: {summary['age_min']} to {summary['age_max']}")
 
-    if df.empty:
-        print("No matching patients found.")
-        return 0
+print("\nTop diagnoses:")
+for item in summary["diagnoses"]:
+    print(f"- {item}")
 
-    summary = build_summary(df)
+print("\nTop labs:")
+for item in summary["labs"]:
+    print(f"- {item}")
 
-    print("\n--- STRUCTURED ANSWER ---")
-    print(summary)
+print("\nTop medications:")
+for item in summary["medications"]:
+    print(f"- {item}")
 
-    print("\n--- LLM ANSWER ---")
-    print(rewrite_summary(summary))
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+# OPTIONAL LLM ANSWER
+print("\n--- LLM ANSWER ---")
+print(rewrite_summary(summary))
