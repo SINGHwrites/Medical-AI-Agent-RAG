@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import duckdb
 from pathlib import Path
 
@@ -48,6 +49,8 @@ for file_name in sql_files:
     result.to_csv(out_file, index=False)
     
 =======
+=======
+>>>>>>> app-v2
 import duckdb
 from pathlib import Path
 
@@ -96,5 +99,8 @@ for file_name in sql_files:
     out_file = OUTPUT_DIR / f"{file_name.replace('.sql', '.csv')}"
     result.to_csv(out_file, index=False)
     
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
     print(f"Saved: {out_file}")

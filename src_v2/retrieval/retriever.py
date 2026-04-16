@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import duckdb
 from pathlib import Path
 
@@ -46,6 +47,8 @@ def retrieve_patients(question: str):
     #query += "\nLIMIT 100000"
 
 =======
+=======
+>>>>>>> app-v2
 import duckdb
 from pathlib import Path
 
@@ -92,5 +95,8 @@ def retrieve_patients(question: str):
 
     #query += "\nLIMIT 100000"
 
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
     return con.execute(query).fetchdf()

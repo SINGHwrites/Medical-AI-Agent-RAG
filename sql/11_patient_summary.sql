@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 WITH demographics AS (
     SELECT
         patient_id,
@@ -68,6 +69,8 @@ LEFT JOIN labs l ON d.patient_id = l.patient_id
 LEFT JOIN medications m ON d.patient_id = m.patient_id
 LEFT JOIN outcomes o ON d.patient_id = o.patient_id
 =======
+=======
+>>>>>>> app-v2
 WITH demographics AS (
     SELECT
         patient_id,
@@ -136,5 +139,8 @@ LEFT JOIN diagnoses dx ON d.patient_id = dx.patient_id
 LEFT JOIN labs l ON d.patient_id = l.patient_id
 LEFT JOIN medications m ON d.patient_id = m.patient_id
 LEFT JOIN outcomes o ON d.patient_id = o.patient_id
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
 ;

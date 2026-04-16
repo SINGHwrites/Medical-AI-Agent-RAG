@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import pandas as pd
 
 def build_summary(df):
@@ -26,6 +27,8 @@ def build_summary(df):
     }
 
 =======
+=======
+>>>>>>> app-v2
 import pandas as pd
 
 def build_summary(df):
@@ -52,5 +55,8 @@ def build_summary(df):
         "medications": list(top_meds.index)
     }
 
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
     return summary

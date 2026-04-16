@@ -117,6 +117,7 @@ Optional narrative interpretation
 
 ## Current Version
 
+<<<<<<< HEAD
 v2 = Hybrid Retrieval Stable Baseline
 # Medical AI Agent RAG v2
 
@@ -238,3 +239,6 @@ Optional narrative interpretation
 ## Current Version
 
 v2 = Hybrid Retrieval Stable Baseline
+=======
+v2 = Hybrid Retrieval Stable Baseline
+>>>>>>> app-v2

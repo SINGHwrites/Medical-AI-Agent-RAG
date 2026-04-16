@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import duckdb
 from pathlib import Path
 
@@ -31,6 +32,8 @@ for file_name in sql_files:
     result = con.execute(query).fetchdf()
     
 =======
+=======
+>>>>>>> app-v2
 import duckdb
 from pathlib import Path
 
@@ -62,5 +65,8 @@ for file_name in sql_files:
 
     result = con.execute(query).fetchdf()
     
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
     print(result.head())

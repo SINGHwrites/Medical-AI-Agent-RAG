@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -42,6 +43,8 @@ np.save(EMBEDDING_FILE, embeddings)
 print("Embeddings saved.")
 print(embeddings.shape)
 =======
+=======
+>>>>>>> app-v2
 import pandas as pd
 import numpy as np
 from pathlib import Path
@@ -83,5 +86,9 @@ embeddings = model.encode(
 np.save(EMBEDDING_FILE, embeddings)
 
 print("Embeddings saved.")
+<<<<<<< HEAD
 print(embeddings.shape)
 >>>>>>> d3190ad (Add hybrid retrieval v2 prototype)
+=======
+print(embeddings.shape)
+>>>>>>> app-v2

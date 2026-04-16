@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import faiss
 import numpy as np
 import pandas as pd
@@ -45,6 +46,8 @@ print(results[[
     "medications"
 ]])
 =======
+=======
+>>>>>>> app-v2
 import faiss
 import numpy as np
 import pandas as pd
@@ -89,5 +92,9 @@ print(results[[
     "diagnoses",
     "labs",
     "medications"
+<<<<<<< HEAD
 ]])
 >>>>>>> d3190ad (Add hybrid retrieval v2 prototype)
+=======
+]])
+>>>>>>> app-v2

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import duckdb
 import pandas as pd
 from pathlib import Path
@@ -97,6 +98,8 @@ print(answer)
 #diabetes kidney elderly
 #obesity icu
 =======
+=======
+>>>>>>> app-v2
 import duckdb
 import pandas as pd
 from pathlib import Path
@@ -194,5 +197,8 @@ print(answer)
 
 #diabetes kidney elderly
 #obesity icu
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
 #hypertension death

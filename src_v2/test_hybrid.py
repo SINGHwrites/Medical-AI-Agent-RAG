@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from retrieval.hybrid_retriever import hybrid_retrieve
 
 question = input("Hybrid query: ")
@@ -12,6 +13,8 @@ print(df[[
     "medications"
 ]])
 =======
+=======
+>>>>>>> app-v2
 from retrieval.hybrid_retriever import hybrid_retrieve
 
 question = input("Hybrid query: ")
@@ -23,5 +26,9 @@ print(df[[
     "diagnoses",
     "labs",
     "medications"
+<<<<<<< HEAD
 ]])
 >>>>>>> d3190ad (Add hybrid retrieval v2 prototype)
+=======
+]])
+>>>>>>> app-v2

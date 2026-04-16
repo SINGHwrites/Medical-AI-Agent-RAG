@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import duckdb
 import pandas as pd
 from pathlib import Path
@@ -94,6 +95,8 @@ for item in top_labs.index:
 print("\nTop medications:")
 for item in top_meds.index:
 =======
+=======
+>>>>>>> app-v2
 import duckdb
 import pandas as pd
 from pathlib import Path
@@ -188,5 +191,8 @@ for item in top_labs.index:
 
 print("\nTop medications:")
 for item in top_meds.index:
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
     print(f"- {item}")

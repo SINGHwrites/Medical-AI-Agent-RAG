@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 | Domain       | Keep                                    | Why                     |
 | ------------ | --------------------------------------- | ----------------------- |
 | Demographics | age, sex, bmi                           | stable patient identity |
@@ -76,6 +77,8 @@ Validation Result -> summary is strong because:
 |  labs	           |    clinically relevant    |
 |  medications	   |    deduplicated           |
 =======
+=======
+>>>>>>> app-v2
 | Domain       | Keep                                    | Why                     |
 | ------------ | --------------------------------------- | ----------------------- |
 | Demographics | age, sex, bmi                           | stable patient identity |
@@ -152,5 +155,8 @@ Validation Result -> summary is strong because:
 |  diagnoses       |    compressed correctly   |
 |  labs	           |    clinically relevant    |
 |  medications	   |    deduplicated           |
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
 |  outcomes	       |    normalized             |

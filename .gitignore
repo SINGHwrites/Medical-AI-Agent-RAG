@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .venv/
 __pycache__/
 *.parquet
@@ -6,11 +7,16 @@ __pycache__/
 outputs/
 data/indexes/
 =======
+=======
+>>>>>>> app-v2
 .venv/
 __pycache__/
 *.parquet
 *.csv
 outputs/
 data/indexes/
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2
 .ipynb_checkpoints/

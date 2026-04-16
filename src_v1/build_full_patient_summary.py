@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import duckdb
 from pathlib import Path
 
@@ -39,6 +40,8 @@ print(result.head())
 print(f"Saved CSV: {CSV_OUT}")
 print(f"Saved Parquet: {PARQUET_OUT}")
 =======
+=======
+>>>>>>> app-v2
 import duckdb
 from pathlib import Path
 
@@ -78,4 +81,7 @@ print(result.head())
 
 print(f"Saved CSV: {CSV_OUT}")
 print(f"Saved Parquet: {PARQUET_OUT}")
+<<<<<<< HEAD
 >>>>>>> aab3ca2 (Initial project import)
+=======
+>>>>>>> app-v2

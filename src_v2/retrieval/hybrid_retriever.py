@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import faiss
 import numpy as np
 import pandas as pd
@@ -48,6 +49,8 @@ def hybrid_retrieve(question: str):
     return merged
 
 =======
+=======
+>>>>>>> app-v2
 import faiss
 import numpy as np
 import pandas as pd
@@ -96,4 +99,7 @@ def hybrid_retrieve(question: str):
 
     return merged
 
+<<<<<<< HEAD
 >>>>>>> d3190ad (Add hybrid retrieval v2 prototype)
+=======
+>>>>>>> app-v2
