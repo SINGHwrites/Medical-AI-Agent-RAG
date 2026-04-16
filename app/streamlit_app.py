@@ -139,6 +139,20 @@ Clinical Narrative:
             file_name=f"medical_report_{question.replace(' ', '_')}.txt",
             mime="text/plain"
         )
+        
+        preview_cols = ["patient_id", "diagnoses", "labs", "medications"]
+        
+        # -----------------------------
+        # CSV EXPORT
+        # -----------------------------
+        csv_data = df[preview_cols].head(50).to_csv(index=False)
+
+        st.download_button(
+            label="Download Patients CSV",
+            data=csv_data,
+            file_name=f"patients_{question.replace(' ', '_')}.csv",
+            mime="text/csv"
+        )
 
         # -----------------------------
         # PATIENT TABLE
