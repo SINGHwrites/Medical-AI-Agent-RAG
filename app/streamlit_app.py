@@ -1,120 +1,195 @@
 import sys
 from pathlib import Path
+import time
 
-# -----------------------------
 # ROOT PATH
-# -----------------------------
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
 import streamlit as st
-
 from src_v2.retrieval.hybrid_retriever import hybrid_retrieve
 from src_v2.summarizer.summary_builder import build_summary
 from src_v2.llm.llm_rewriter import rewrite_summary
 
-# -----------------------------
 # PAGE CONFIG
-# -----------------------------
-st.set_page_config(
-    page_title="Medical AI Agent v2.1",
-    layout="wide"
-)
+st.set_page_config(page_title="Medical AI Agent v2.1", layout="wide")
 
-# -----------------------------
 # SIDEBAR
-# -----------------------------
 st.sidebar.title("Recent Queries")
 
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if "results" not in st.session_state:
+    st.session_state.results = []
+
 for q in st.session_state.history[-5:][::-1]:
     st.sidebar.write(f"- {q}")
 
-# -----------------------------
 # TITLE
-# -----------------------------
 st.title("Medical AI Agent v2.1")
-st.markdown("Hybrid Retrieval + Structured Summary + LLM Clinical Narrative")
+st.markdown("Hybrid Retrieval + Structured Summary + Optional Clinical Narrative")
 
-# -----------------------------
 # INPUT
-# -----------------------------
 question = st.text_input("Ask medical query:")
+generate_llm = st.checkbox("Generate clinical narrative")
 
-# -----------------------------
 # BUTTON
-# -----------------------------
 if st.button("Analyze"):
 
     if not question.strip():
         st.warning("Please enter a medical query.")
         st.stop()
 
-    # -----------------------------
-    # SAVE HISTORY
-    # -----------------------------
     st.session_state.history.append(question)
 
-    with st.spinner("Running hybrid retrieval and clinical summarization..."):
+    progress = st.progress(0)
+    status = st.empty()
+    runtime_box = st.empty()
 
-        # -----------------------------
-        # RETRIEVE
-        # -----------------------------
-        df = hybrid_retrieve(question)
+    start_total = time.time()
 
-        if df.empty:
-            st.warning("No matching patients found.")
-            st.stop()
+    # -----------------------------
+    # RETRIEVAL
+    # -----------------------------
+    status.text("Running hybrid retrieval...")
+    t1 = time.time()
 
-        # -----------------------------
-        # SUMMARY
-        # -----------------------------
-        summary = build_summary(df)
+    df = hybrid_retrieve(question)
 
-        # -----------------------------
-        # METRICS
-        # -----------------------------
-        c1, c2 = st.columns(2)
-        c1.metric("Patients Found", summary["count"])
-        c2.metric("Age Range", f"{summary['age_min']} - {summary['age_max']}")
+    retrieval_time = time.time() - t1
 
-        # -----------------------------
-        # TWO COLUMN LAYOUT
-        # -----------------------------
-        left, right = st.columns(2)
+    progress.progress(35)
 
-        with left:
-            st.subheader("Structured Evidence")
+    runtime_box.info(f"Elapsed after retrieval: {time.time() - start_total:.2f}s")
 
-            st.write("Top diagnoses:")
-            for item in summary["diagnoses"]:
-                st.write(f"- {item}")
+    if df.empty:
+        st.warning("No matching patients found.")
+        st.stop()
 
-            st.write("Top labs:")
-            for item in summary["labs"]:
-                st.write(f"- {item}")
+    # -----------------------------
+    # SUMMARY
+    # -----------------------------
+    status.text("Building structured summary...")
+    t2 = time.time()
 
-            st.write("Top medications:")
-            for item in summary["medications"]:
-                st.write(f"- {item}")
+    summary = build_summary(df)
 
-        with right:
-            st.subheader("Clinical Narrative")
+    summary_time = time.time() - t2
 
-            llm_answer = rewrite_summary(summary)
+    progress.progress(65)
 
+    runtime_box.info(f"Elapsed after summary: {time.time() - start_total:.2f}s")
+
+    # -----------------------------
+    # LLM
+    # -----------------------------
+    llm_answer = "Clinical narrative disabled."
+    llm_time = 0
+
+    if generate_llm:
+        status.text("Generating clinical narrative...")
+        t3 = time.time()
+
+        runtime_box.info(f"LLM started at: {time.time() - start_total:.2f}s")
+
+        llm_answer = rewrite_summary(summary)
+
+        llm_time = time.time() - t3
+
+        runtime_box.info(f"Elapsed after LLM: {time.time() - start_total:.2f}s")
+
+    progress.progress(100)
+
+    status.text("Completed.")
+
+    total_time = time.time() - start_total
+
+    runtime_box.success(f"Total runtime: {total_time:.2f}s")
+
+    # -----------------------------
+    # STORE CURRENT RESULT
+    # -----------------------------
+    st.session_state.results.insert(0, {
+        "query": question,
+        "summary": summary,
+        "llm": llm_answer,
+        "retrieval_time": retrieval_time,
+        "summary_time": summary_time,
+        "llm_time": llm_time,
+        "total_time": total_time
+    })
+
+    # -----------------------------
+    # METRICS
+    # -----------------------------
+    c1, c2 = st.columns(2)
+
+    c1.metric("Patients Found", summary["count"])
+    c2.metric("Age Range", f"{summary['age_min']} - {summary['age_max']}")
+
+    # -----------------------------
+    # TIMINGS
+    # -----------------------------
+    st.subheader("Processing Times")
+
+    tcol1, tcol2, tcol3, tcol4 = st.columns(4)
+
+    tcol1.metric("Retrieval", f"{retrieval_time:.2f}s")
+    tcol2.metric("Summary", f"{summary_time:.2f}s")
+    tcol3.metric("LLM", f"{llm_time:.2f}s")
+    tcol4.metric("Total", f"{total_time:.2f}s")
+
+    # -----------------------------
+    # PREVIEW COLUMNS
+    # -----------------------------
+    preview_cols = [
+        "patient_id",
+        "diagnoses",
+        "labs",
+        "medications"
+    ]
+
+    # -----------------------------
+    # TWO COLUMN LAYOUT
+    # -----------------------------
+    left, right = st.columns(2)
+
+    with left:
+        st.subheader("Structured Evidence")
+
+        st.write("Top diagnoses:")
+        for item in summary["diagnoses"]:
+            st.write(f"- {item}")
+
+        st.write("Top labs:")
+        for item in summary["labs"]:
+            st.write(f"- {item}")
+
+        st.write("Top medications:")
+        for item in summary["medications"]:
+            st.write(f"- {item}")
+
+    with right:
+        st.subheader("Clinical Narrative")
+
+        if generate_llm:
             st.write(llm_answer)
+        else:
+            st.info("Enable checkbox above to generate LLM narrative.")
 
-        # -----------------------------
-        # EXPORT REPORT
-        # -----------------------------
-        report_text = f"""
+    # -----------------------------
+    # EXPORT REPORT
+    # -----------------------------
+    report_text = f"""
 Medical AI Agent v2.1 Report
 
 Query:
 {question}
+
+Retrieval time: {retrieval_time:.2f}s
+Summary time: {summary_time:.2f}s
+LLM time: {llm_time:.2f}s
 
 Structured Answer:
 Patients found: {summary['count']}
@@ -133,40 +208,56 @@ Clinical Narrative:
 {llm_answer}
 """
 
-        st.download_button(
-            label="Download Report",
-            data=report_text,
-            file_name=f"medical_report_{question.replace(' ', '_')}.txt",
-            mime="text/plain"
+    st.download_button(
+        label="Download Report",
+        data=report_text,
+        file_name=f"medical_report_{question.replace(' ', '_')}.txt",
+        mime="text/plain"
+    )
+
+    # -----------------------------
+    # CSV EXPORT
+    # -----------------------------
+    csv_data = df[preview_cols].head(50).to_csv(index=False)
+
+    st.download_button(
+        label="Download Patients CSV",
+        data=csv_data,
+        file_name=f"patients_{question.replace(' ', '_')}.csv",
+        mime="text/csv"
+    )
+
+    # -----------------------------
+    # PATIENT TABLE
+    # -----------------------------
+    with st.expander("Show Retrieved Patients"):
+        st.dataframe(
+            df[preview_cols].head(10),
+            use_container_width=True
         )
-        
-        preview_cols = ["patient_id", "diagnoses", "labs", "medications"]
-        
-        # -----------------------------
-        # CSV EXPORT
-        # -----------------------------
-        csv_data = df[preview_cols].head(50).to_csv(index=False)
 
-        st.download_button(
-            label="Download Patients CSV",
-            data=csv_data,
-            file_name=f"patients_{question.replace(' ', '_')}.csv",
-            mime="text/csv"
-        )
+    # -----------------------------
+    # PREVIOUS RESULTS
+    # -----------------------------
+    if len(st.session_state.results) > 1:
+        st.subheader("Previous Query Results")
 
-        # -----------------------------
-        # PATIENT TABLE
-        # -----------------------------
-        with st.expander("Show Retrieved Patients"):
+        for i, item in enumerate(st.session_state.results[1:4], start=1):
+            with st.expander(f"{i}. {item['query']}"):
 
-            preview_cols = [
-                "patient_id",
-                "diagnoses",
-                "labs",
-                "medications"
-            ]
+                st.write(f"Patients found: {item['summary']['count']}")
+                st.write(f"Age range: {item['summary']['age_min']} - {item['summary']['age_max']}")
 
-            st.dataframe(
-                df[preview_cols].head(10),
-                use_container_width=True
-            )
+                st.write("Top diagnoses:")
+                for d in item["summary"]["diagnoses"]:
+                    st.write(f"- {d}")
+
+                st.write("Clinical Narrative:")
+                st.write(item["llm"])
+
+                st.write(
+                    f"Timing: Retrieval {item['retrieval_time']:.2f}s | "
+                    f"Summary {item['summary_time']:.2f}s | "
+                    f"LLM {item['llm_time']:.2f}s | "
+                    f"Total {item['total_time']:.2f}s"
+                )
