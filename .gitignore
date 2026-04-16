@@ -6,6 +6,7 @@ __pycache__/
 *.csv
 outputs/
 data/indexes/
+src_v1/
 =======
 =======
 >>>>>>> app-v2
