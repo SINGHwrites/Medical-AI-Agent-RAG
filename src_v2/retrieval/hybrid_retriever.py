@@ -1,4 +1,5 @@
 import faiss
+faiss.omp_set_num_threads(4)
 import numpy as np
 import pandas as pd
 from pathlib import Path

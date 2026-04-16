@@ -6,6 +6,8 @@ PARQUET_FILE = BASE_DIR / "data" / "summaries" / "patient_summary.parquet"
 
 def retrieve_patients(question: str):
     con = duckdb.connect()
+    
+    con.execute("PRAGMA threads=6")
 
     question = question.lower()
     conditions = []

@@ -1,9 +1,23 @@
+import torch
 from transformers import pipeline
+from functools import lru_cache
 
-generator = pipeline("text-generation",model="Qwen/Qwen2.5-1.5B-Instruct")
+# CPU threading
+torch.set_num_threads(4)
 
-def rewrite_summary(summary):
+# MODEL CACHE
+@lru_cache(maxsize=1)
+def load_model():
+    return pipeline(
+        "text-generation",
+        model="Qwen/Qwen2.5-1.5B-Instruct"
+    )
     
+# REWRITE FUNCTION
+def rewrite_summary(summary):
+
+    generator = load_model()
+
     prompt = f"""
 Use only this cohort evidence.
 
@@ -13,19 +27,23 @@ Diagnoses: {', '.join(summary['diagnoses'])}
 Labs: {', '.join(summary['labs'])}
 Medications: {', '.join(summary['medications'])}
 
-Write exactly 2 clinical sentences.
-Do not add facts not listed above. Do not infer drug classes or extra tests.
-Write 2 short and concise cohort-level clinical sentences.
+Write 2 concise cohort-level clinical sentences.
+Do not add facts not listed above.
 
 Clinical summary:
 """
+    output = generator(
+        prompt,
+        max_new_tokens=120
+    )[0]["generated_text"]
 
-    output = generator(prompt, max_new_tokens=200)[0]["generated_text"]
     answer = output.split("Clinical summary:")[-1].strip()
     answer = answer.replace("\n", " ")
+
     sentences = answer.split(". ")
-    answer = ". ".join(sentences[:3])
+    answer = ". ".join(sentences[:2])
 
     if not answer.endswith("."):
         answer += "."
+
     return answer
