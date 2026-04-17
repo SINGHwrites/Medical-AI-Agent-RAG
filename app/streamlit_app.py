@@ -10,9 +10,11 @@ import streamlit as st
 from src_v2.retrieval.hybrid_retriever import hybrid_retrieve
 from src_v2.summarizer.summary_builder import build_summary
 from src_v2.llm.llm_rewriter import rewrite_summary
+#from src_v2.llm.gemini_rewriter import rewrite_summary_gemini
+from src_v2.llm.groq_rewriter import rewrite_summary_groq
 
 # PAGE CONFIG
-st.set_page_config(page_title="Medical AI Agent v2.1", layout="wide")
+st.set_page_config(page_title="Medical AI Agent v2.2", layout="wide")
 
 # SIDEBAR
 st.sidebar.title("Recent Queries")
@@ -27,12 +29,19 @@ for q in st.session_state.history[-5:][::-1]:
     st.sidebar.write(f"- {q}")
 
 # TITLE
-st.title("Medical AI Agent v2.1")
-st.markdown("Hybrid Retrieval + Structured Summary + Optional Clinical Narrative")
+st.title("Medical AI Agent v2.2")
+st.markdown("Hybrid Retrieval + Structured Summary + Optional Local / Cloud Clinical Narrative")
 
 # INPUT
 question = st.text_input("Ask medical query:")
-generate_llm = st.checkbox("Generate clinical narrative")
+
+use_local_llm = st.checkbox("Use local LLM")
+#use_gemini = st.checkbox("Use Gemini cloud LLM")
+use_groq = st.checkbox("Use Groq cloud LLM")
+
+if use_local_llm and use_groq:
+    st.warning("Select only one LLM mode.")
+    st.stop()
 
 # BUTTON
 if st.button("Analyze"):
@@ -60,7 +69,6 @@ if st.button("Analyze"):
     retrieval_time = time.time() - t1
 
     progress.progress(35)
-
     runtime_box.info(f"Elapsed after retrieval: {time.time() - start_total:.2f}s")
 
     if df.empty:
@@ -78,7 +86,6 @@ if st.button("Analyze"):
     summary_time = time.time() - t2
 
     progress.progress(65)
-
     runtime_box.info(f"Elapsed after summary: {time.time() - start_total:.2f}s")
 
     # -----------------------------
@@ -87,20 +94,29 @@ if st.button("Analyze"):
     llm_answer = "Clinical narrative disabled."
     llm_time = 0
 
-    if generate_llm:
+    if use_local_llm or use_groq:
         status.text("Generating clinical narrative...")
         t3 = time.time()
 
         runtime_box.info(f"LLM started at: {time.time() - start_total:.2f}s")
 
-        llm_answer = rewrite_summary(summary)
+        try:
+            if use_groq:
+                llm_answer = rewrite_summary_groq(summary)
+            elif use_local_llm:
+                llm_answer = rewrite_summary(summary)
+
+        except Exception as e:
+            llm_answer = f"LLM failed: {e}"
 
         llm_time = time.time() - t3
 
         runtime_box.info(f"Elapsed after LLM: {time.time() - start_total:.2f}s")
 
+    # -----------------------------
+    # COMPLETE
+    # -----------------------------
     progress.progress(100)
-
     status.text("Completed.")
 
     total_time = time.time() - start_total
@@ -108,7 +124,7 @@ if st.button("Analyze"):
     runtime_box.success(f"Total runtime: {total_time:.2f}s")
 
     # -----------------------------
-    # STORE CURRENT RESULT
+    # STORE RESULT
     # -----------------------------
     st.session_state.results.insert(0, {
         "query": question,
@@ -119,6 +135,18 @@ if st.button("Analyze"):
         "llm_time": llm_time,
         "total_time": total_time
     })
+
+    # -----------------------------
+    # ACTIVE MODEL LABEL
+    # -----------------------------
+    if use_local_llm:
+        st.caption("Model: Local Qwen")
+
+    elif use_groq:
+        st.caption("Model: Groq Cloud")
+
+    else:
+        st.caption("Model: None")
 
     # -----------------------------
     # METRICS
@@ -173,16 +201,16 @@ if st.button("Analyze"):
     with right:
         st.subheader("Clinical Narrative")
 
-        if generate_llm:
+        if use_local_llm or use_groq:
             st.write(llm_answer)
         else:
-            st.info("Enable checkbox above to generate LLM narrative.")
+            st.info("Enable one LLM mode above.")
 
     # -----------------------------
     # EXPORT REPORT
     # -----------------------------
     report_text = f"""
-Medical AI Agent v2.1 Report
+Medical AI Agent v2.2 Report
 
 Query:
 {question}
