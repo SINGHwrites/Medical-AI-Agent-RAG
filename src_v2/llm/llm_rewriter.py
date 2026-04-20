@@ -12,7 +12,7 @@ def load_model():
         "text-generation",
         model="Qwen/Qwen2.5-1.5B-Instruct"
     )
-    
+
 # REWRITE FUNCTION
 def rewrite_summary(summary):
 
@@ -27,17 +27,21 @@ Diagnoses: {', '.join(summary['diagnoses'])}
 Labs: {', '.join(summary['labs'])}
 Medications: {', '.join(summary['medications'])}
 
-Write 2 concise cohort-level clinical sentences.
+Write exactly 2 concise cohort-level clinical sentences.
 Do not add facts not listed above.
 
 Clinical summary:
 """
+
     output = generator(
         prompt,
-        max_new_tokens=120
+        max_new_tokens=60,
+        do_sample=False,
+        temperature=0.2,
+        return_full_text=False
     )[0]["generated_text"]
 
-    answer = output.split("Clinical summary:")[-1].strip()
+    answer = output.strip()
     answer = answer.replace("\n", " ")
 
     sentences = answer.split(". ")
