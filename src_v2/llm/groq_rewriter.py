@@ -8,7 +8,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 load_dotenv(ROOT_DIR / ".env")
 
 # READ KEY
-api_key = os.getenv("GROQ_API_KEY")
+api_key = os.getenv("GROQ_API_KEY", "").strip()
 
 # CLIENT
 client = Groq(api_key=api_key)

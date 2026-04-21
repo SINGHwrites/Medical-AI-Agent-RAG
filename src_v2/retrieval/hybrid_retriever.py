@@ -9,11 +9,12 @@ from src_v2.retrieval.retriever import retrieve_patients
 # PATHS
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-PARQUET_FILE = BASE_DIR / "data" / "summaries" / "patient_summary.parquet"
-INDEX_DIR = BASE_DIR / "data" / "indexes"
+PARQUET_FILE = BASE_DIR / "data" / "deploy" / "summaries" / "patient_summary_deploy.parquet"
 
-EMBEDDING_FILE = INDEX_DIR / "patient_embeddings.npy"
-FAISS_FILE = INDEX_DIR / "faiss_index.bin"
+INDEX_DIR = BASE_DIR / "data" / "deploy" / "faiss"
+
+EMBEDDING_FILE = INDEX_DIR / "patient_embeddings_deploy.npy"
+FAISS_FILE = INDEX_DIR / "patient_index_deploy.faiss"
 
 # LOAD STATIC OBJECTS ONCE
 df_all = pd.read_parquet(PARQUET_FILE)

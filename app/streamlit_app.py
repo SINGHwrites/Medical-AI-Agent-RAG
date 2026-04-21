@@ -34,10 +34,8 @@ st.markdown("Hybrid Retrieval + Structured Summary + Optional Local / Cloud Clin
 
 # INPUT
 question = st.text_input("Ask medical query:")
-
-use_local_llm = st.checkbox("Use local LLM")
-#use_gemini = st.checkbox("Use Gemini cloud LLM")
-use_groq = st.checkbox("Use Groq cloud LLM")
+use_local_llm = st.checkbox("Use local LLM (slow fallback)")
+use_groq = st.checkbox("Use cloud LLM (Groq)")
 
 if use_local_llm and use_groq:
     st.warning("Select only one LLM mode.")
