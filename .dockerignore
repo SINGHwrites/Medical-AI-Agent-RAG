@@ -1,0 +1,8 @@
+.venv
+.git
+**pycache**
+*.pyc
+.env
+.ipynb_checkpoints
+__pycache__
+*.log
