@@ -2,7 +2,7 @@ import duckdb
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-PARQUET_FILE = BASE_DIR / "data" / "summaries" / "patient_summary.parquet"
+PARQUET_FILE = BASE_DIR / "data" / "deploy" / "summaries" / "patient_summary_deploy.parquet"
 
 def retrieve_patients(question: str):
     con = duckdb.connect()
@@ -36,9 +36,11 @@ def retrieve_patients(question: str):
     if "death" in question:
         conditions.append("in_hospital_death = 1")
 
+    parquet_path = str(PARQUET_FILE).replace("\\", "/")
+
     query = f"""
     SELECT *
-    FROM read_parquet('{str(PARQUET_FILE).replace("\\", "/")}')
+    FROM read_parquet('{parquet_path}')
     """
 
     if conditions:
