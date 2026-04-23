@@ -1,9 +1,10 @@
 streamlit
 pandas
+numpy
 duckdb
 faiss-cpu
 sentence-transformers
-transformers
-torch
-python-dotenv
 groq
+python-dotenv
+pyarrow
+fastparquet
