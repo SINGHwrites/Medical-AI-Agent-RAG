@@ -1,0 +1,9 @@
+streamlit
+pandas
+duckdb
+faiss-cpu
+sentence-transformers
+transformers
+torch
+python-dotenv
+groq
