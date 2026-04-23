@@ -9,8 +9,7 @@ sys.path.append(str(ROOT_DIR))
 import streamlit as st
 from src_v2.retrieval.hybrid_retriever import hybrid_retrieve
 from src_v2.summarizer.summary_builder import build_summary
-from src_v2.llm.llm_rewriter import rewrite_summary
-#from src_v2.llm.gemini_rewriter import rewrite_summary_gemini
+#from src_v2.llm.llm_rewriter import rewrite_summary
 from src_v2.llm.groq_rewriter import rewrite_summary_groq
 
 # PAGE CONFIG
@@ -34,12 +33,12 @@ st.markdown("Hybrid Retrieval + Structured Summary + Optional Local / Cloud Clin
 
 # INPUT
 question = st.text_input("Ask medical query:")
-use_local_llm = st.checkbox("Use local LLM (slow fallback)")
+#use_local_llm = st.checkbox("Use local LLM (slow fallback)")
 use_groq = st.checkbox("Use cloud LLM (Groq)")
 
-if use_local_llm and use_groq:
-    st.warning("Select only one LLM mode.")
-    st.stop()
+#if use_local_llm and use_groq:
+    #st.warning("Select only one LLM mode.")
+    #st.stop()
 
 # BUTTON
 if st.button("Analyze"):
