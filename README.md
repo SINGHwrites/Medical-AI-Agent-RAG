@@ -22,11 +22,17 @@ The agent retrieves matching patients, summarizes cohort evidence, and optionall
 # End-to-End Architecture
 
 medical-ai-agent/
+
 ├── app/
+
 ├── src_v2/
+
 ├── data/
+
 ├── sql/
+
 ├── scripts/
+
 ├── Dockerfile
 
 ---
