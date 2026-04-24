@@ -5,6 +5,4 @@ duckdb
 faiss-cpu
 sentence-transformers
 groq
-python-dotenv
 pyarrow
-fastparquet

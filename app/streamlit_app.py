@@ -27,8 +27,8 @@ for q in st.session_state.history[-5:][::-1]:
     st.sidebar.write(f"- {q}")
 
 # TITLE
-st.title("Medical AI Agent v2.2")
-st.markdown("Hybrid Retrieval + Structured Summary + Optional Local / Cloud Clinical Narrative")
+st.title("Medical AI Agent v2.4")
+st.markdown("Hybrid Retrieval + Structured Summary + Optional Groq Clinical Narrative")
 
 # INPUT
 question = st.text_input("Ask medical query:")

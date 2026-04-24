@@ -1,11 +1,16 @@
 import os
 from pathlib import Path
 from groq import Groq
-from dotenv import load_dotenv
+
+try:
+    from dotenv import load_dotenv
+except Exception:
+    load_dotenv = None
 
 # FORCE ROOT .env LOAD
 ROOT_DIR = Path(__file__).resolve().parents[2]
-load_dotenv(ROOT_DIR / ".env")
+if load_dotenv is not None:
+    load_dotenv(ROOT_DIR / ".env")
 
 def _get_client() -> Groq:
     api_key = os.getenv("GROQ_API_KEY", "").strip()

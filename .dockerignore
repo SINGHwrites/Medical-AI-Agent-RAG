@@ -6,3 +6,12 @@
 .ipynb_checkpoints
 __pycache__
 *.log
+app/__pycache__/
+src_v2/**/__pycache__/
+src_v2/agent/
+src_v2/__main__.py
+src_v2/test_hybrid.py
+src_v2/llm/llm_rewriter.py
+src_v2/llm/llm_rewriter2.py
+src_v2/retrieval/build_embeddings.py
+src_v2/retrieval/vector_retriever.py
