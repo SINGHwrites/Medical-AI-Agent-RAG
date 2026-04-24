@@ -14,7 +14,7 @@ from src_v2.llm.llm_rewriter import rewrite_summary
 from src_v2.llm.groq_rewriter import rewrite_summary_groq
 
 # PAGE CONFIG
-st.set_page_config(page_title="Medical AI Agent v2.2", layout="wide")
+st.set_page_config(page_title="Medical AI Agent v2.3", layout="wide")
 
 # SIDEBAR
 st.sidebar.title("Recent Queries")
@@ -29,7 +29,7 @@ for q in st.session_state.history[-5:][::-1]:
     st.sidebar.write(f"- {q}")
 
 # TITLE
-st.title("Medical AI Agent v2.2")
+st.title("Medical AI Agent v2.3")
 st.markdown("Hybrid Retrieval + Structured Summary + Optional Local / Cloud Clinical Narrative")
 
 # INPUT
@@ -210,7 +210,7 @@ if st.button("Analyze"):
     # EXPORT REPORT
     # -----------------------------
     report_text = f"""
-Medical AI Agent v2.2 Report
+Medical AI Agent v2.3 Report
 
 Query:
 {question}
