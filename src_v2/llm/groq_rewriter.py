@@ -7,13 +7,14 @@ from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).resolve().parents[2]
 load_dotenv(ROOT_DIR / ".env")
 
-# READ KEY
-api_key = os.getenv("GROQ_API_KEY", "").strip()
-
-# CLIENT
-client = Groq(api_key=api_key)
+def _get_client() -> Groq:
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY is not set.")
+    return Groq(api_key=api_key)
 
 def rewrite_summary_groq(summary):
+    client = _get_client()
 
     prompt = f"""
 Use only this cohort evidence.

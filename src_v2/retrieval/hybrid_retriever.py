@@ -2,6 +2,7 @@ import faiss
 faiss.omp_set_num_threads(4)
 import numpy as np
 import pandas as pd
+from functools import lru_cache
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
 from src_v2.retrieval.retriever import retrieve_patients
@@ -16,17 +17,26 @@ INDEX_DIR = BASE_DIR / "data" / "deploy" / "faiss"
 EMBEDDING_FILE = INDEX_DIR / "patient_embeddings_deploy.npy"
 FAISS_FILE = INDEX_DIR / "patient_index_deploy.faiss"
 
-# LOAD STATIC OBJECTS ONCE
-df_all = pd.read_parquet(PARQUET_FILE)
 
-embeddings = np.load(EMBEDDING_FILE).astype("float32")
+@lru_cache(maxsize=1)
+def _load_index_data():
+    df_all = pd.read_parquet(PARQUET_FILE)
+    if EMBEDDING_FILE.exists():
+        np.load(EMBEDDING_FILE)
+    index = faiss.read_index(str(FAISS_FILE))
+    return df_all, index
 
-index = faiss.read_index(str(FAISS_FILE))
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+@lru_cache(maxsize=1)
+def _get_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
 
 # HYBRID RETRIEVAL
 def hybrid_retrieve(question: str):
+    if not question.strip():
+        return pd.DataFrame()
+    df_all, index = _load_index_data()
+    model = _get_model()
 
     # SQL RETRIEVAL
     sql_df = retrieve_patients(question)

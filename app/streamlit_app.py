@@ -9,7 +9,6 @@ sys.path.append(str(ROOT_DIR))
 import streamlit as st
 from src_v2.retrieval.hybrid_retriever import hybrid_retrieve
 from src_v2.summarizer.summary_builder import build_summary
-#from src_v2.llm.llm_rewriter import rewrite_summary
 from src_v2.llm.groq_rewriter import rewrite_summary_groq
 
 # PAGE CONFIG
@@ -33,12 +32,7 @@ st.markdown("Hybrid Retrieval + Structured Summary + Optional Local / Cloud Clin
 
 # INPUT
 question = st.text_input("Ask medical query:")
-#use_local_llm = st.checkbox("Use local LLM (slow fallback)")
 use_groq = st.checkbox("Use cloud LLM (Groq)")
-
-#if use_local_llm and use_groq:
-    #st.warning("Select only one LLM mode.")
-    #st.stop()
 
 # BUTTON
 if st.button("Analyze"):
@@ -91,17 +85,14 @@ if st.button("Analyze"):
     llm_answer = "Clinical narrative disabled."
     llm_time = 0
 
-    if use_local_llm or use_groq:
+    if use_groq:
         status.text("Generating clinical narrative...")
         t3 = time.time()
 
         runtime_box.info(f"LLM started at: {time.time() - start_total:.2f}s")
 
         try:
-            if use_groq:
-                llm_answer = rewrite_summary_groq(summary)
-            elif use_local_llm:
-                llm_answer = rewrite_summary(summary)
+            llm_answer = rewrite_summary_groq(summary)
 
         except Exception as e:
             llm_answer = f"LLM failed: {e}"
@@ -136,10 +127,7 @@ if st.button("Analyze"):
     # -----------------------------
     # ACTIVE MODEL LABEL
     # -----------------------------
-    if use_local_llm:
-        st.caption("Model: Local Qwen")
-
-    elif use_groq:
+    if use_groq:
         st.caption("Model: Groq Cloud")
 
     else:
@@ -198,10 +186,10 @@ if st.button("Analyze"):
     with right:
         st.subheader("Clinical Narrative")
 
-        if use_local_llm or use_groq:
+        if use_groq:
             st.write(llm_answer)
         else:
-            st.info("Enable one LLM mode above.")
+            st.info("Enable Groq to generate a clinical narrative.")
 
     # -----------------------------
     # EXPORT REPORT
