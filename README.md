@@ -85,11 +85,11 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 ## Install
 
-Install dependencies from the repo's current requirements file:
+Install dependencies:
 
 ```powershell
 pip install --upgrade pip
-pip install -r docs/requirements_v2.txt
+pip install -r requirements.txt
 ```
 
 If you want to use Groq rewriting, create a root `.env` file:
@@ -124,6 +124,12 @@ How to use it:
 ### Terminal Mode
 
 Run the terminal version:
+
+```powershell
+python -m src_v2
+```
+
+You can still run the module file directly if needed:
 
 ```powershell
 python src_v2/agent/main.py
