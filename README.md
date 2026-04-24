@@ -1,339 +1,155 @@
-# Medical AI Agent
+# Medical AI Agent RAG
 
-A production-oriented medical cohort retrieval and summarization system built from scratch using open-source Python tools.
+Medical AI Agent RAG is a local-first retrieval and summarization project for cohort-style medical questions. It combines:
 
-The project transforms large-scale structured clinical data into an interactive AI-assisted retrieval engine capable of cohort filtering, semantic similarity search, structured evidence summarization, optional LLM clinical narrative generation, and Dockerized production packaging.
+- rule-based cohort filtering with DuckDB
+- semantic search with Sentence Transformers + FAISS
+- structured cohort summarization
+- optional LLM rewriting with either a local Qwen model or the Groq API
+- a Streamlit UI for interactive use
 
----
+Example queries:
 
-# Project Objective
+- `obesity death`
+- `diabetes kidney elderly`
+- `hypertension readmitted`
+- `obesity ICU`
 
-The goal of this system is to build a practical medical AI retrieval agent that can answer cohort-level medical questions such as:
+## Repository Layout
 
-- obesity death
-- diabetes kidney elderly
-- hypertension readmitted
-- obesity ICU
+```text
+.
+|-- app/
+|   `-- streamlit_app.py
+|-- docs/
+|   |-- readme_v1.md
+|   |-- readme_v2.md
+|   `-- requirements_v2.txt
+|-- sql/
+|-- src_v1/
+`-- src_v2/
+    |-- agent/
+    |-- llm/
+    |-- retrieval/
+    `-- summarizer/
+```
 
-The agent retrieves matching patients, summarizes cohort evidence, and optionally generates concise clinical narratives.
+## Prerequisites
 
----
+- Python 3.12 recommended
+- `pip`
+- Git
+- Internet access on first run to download model assets
 
-# End-to-End Architecture
+Optional:
 
-medical-ai-agent/
+- a Groq API key if you want cloud LLM rewriting
 
-├── app/
+## Required Local Data
 
-├── src_v2/
+The tracked Git repository does not include the large runtime data artifacts. To run the app successfully, place these files in the project under the exact paths below:
 
-├── data/
+- `data/summaries/patient_summary.parquet`
+- `data/indexes/patient_embeddings.npy`
+- `data/indexes/faiss_index.bin`
 
-├── sql/
+Without those files, the retrieval module will fail at startup.
 
-├── scripts/
+## Setup
 
-├── Dockerfile
+Clone the repository and move into the project directory:
 
----
+```powershell
+git clone https://github.com/SINGHwrites/Medical-AI-Agent-RAG.git
+cd Medical-AI-Agent-RAG
+```
 
-# Phase 1 — Clinical Data Engineering
+Create a virtual environment:
 
-Multiple synthetic medical tables were merged into one large unified dataset.
+```powershell
+python -m venv .venv
+```
 
-Source tables:
-- patients
-- diagnoses
-- lab_results
-- medications
-- outcomes
+Activate it:
 
-Initial merged dataset characteristics:
-- 33,919,890 rows
-- 64 columns
-- approximately 10 GB
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-This stage focused on schema control, dtype optimization, and efficient storage design.
+If PowerShell execution policy blocks activation, use:
 
----
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\.venv\Scripts\Activate.ps1
+```
 
-# Phase 2 — SQL Analytical Layer
+## Install
 
-DuckDB was selected as the analytical engine because of its local speed and low setup overhead.
+Install dependencies from the repo's current requirements file:
 
-Implemented SQL profiling:
-- row count
-- unique patients
-- null profile
-- diagnosis prevalence
-- lab prevalence
-- medication prevalence
+```powershell
+pip install --upgrade pip
+pip install -r docs/requirements_v2.txt
+```
 
-Custom SQL queries were created for medical cohort retrieval.
+If you want to use Groq rewriting, create a root `.env` file:
 
-Supported cohort filters:
-- obesity
-- hypertension
-- diabetes
-- chronic kidney disease
-- ICU admission
-- mortality
-- readmission
-- elderly population
-
----
-
-# Phase 3 — Patient Summary Construction
-
-A patient-level summary table was created to compress row-level clinical data into retrieval-ready records.
-
-Final summary columns:
-- patient_id
-- age
-- sex
-- bmi
-- smoking_status
-- alcohol_use
-- exercise_level
-- diagnoses
-- labs
-- medications
-- readmitted_30d
-- in_hospital_death
-- icu_admission
-
-Summary dataset size:
-- 100,000 patient summaries
-
-Storage:
-- parquet
-- deploy-safe parquet subset
-
----
-
-# Phase 4 — Hybrid Retrieval Engine
-
-Hybrid retrieval combines:
-
-## SQL retrieval
-Fast rule-based cohort filtering using DuckDB.
-
-## Semantic retrieval
-Embedding-based similarity search using FAISS.
-
-Embedding model:
-all-MiniLM-L6-v2
-
-Vector store:
-FAISS index
-
-Hybrid retrieval merges:
-- SQL matches
-- semantic nearest neighbors
-
-Final result size:
-- top 100 patients
-
----
-
-# Phase 5 — Structured Cohort Summarization
-
-A summary builder converts retrieved patients into structured evidence.
-
-Output includes:
-- patient count
-- age range
-- top diagnoses
-- top labs
-- top medications
-
-This creates deterministic evidence before LLM generation.
-
----
-
-# Phase 6 — LLM Layer
-
-Two optional LLM modes were implemented.
-
-## Local LLM
-Qwen2.5-1.5B-Instruct
-
-Used for fully local inference.
-
-## Cloud LLM
-Groq API
-
-Used for faster inference and lower local CPU load.
-
-Cloud mode is recommended for production.
-
----
-
-# Phase 7 — Streamlit Application
-
-Interactive application built using Streamlit.
-
-Features:
-- query input
-- structured evidence display
-- optional clinical narrative generation
-- retrieval timing
-- previous query persistence
-- CSV export
-- report export
-
-The application supports both local and cloud LLM selection.
-
----
-
-# Phase 8 — Deployment Dataset Engineering
-
-Full production dataset was too large for lightweight deployment.
-
-A deploy-safe subset was created.
-
-Deploy subset:
-- 5000 patient rows
-- deploy parquet
-- deploy embeddings
-- deploy FAISS index
-
-Purpose:
-- memory-safe container deployment
-- cloud demonstration
-
----
-
-# Phase 9 — Docker Production Packaging
-
-Application was containerized using Docker.
-
-Docker base:
-python:3.11-slim
-
-Container includes:
-- Streamlit app
-- retrieval engine
-- deploy dataset
-- cloud LLM integration
-
-## Build
-
-docker build -t medical-ai-agent .
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
 
 ## Run
 
-docker run -p 8501:8501 -e GROQ_API_KEY=YOUR_KEY medical-ai-agent
+### Streamlit UI
 
-Validated locally:
-- retrieval works
-- LLM works
-- Streamlit works inside container
+Start the web app:
 
----
+```powershell
+streamlit run app/streamlit_app.py
+```
 
-# Current Technical Status
+Open the local URL shown by Streamlit, typically:
 
-Completed:
-- local full retrieval system
-- hybrid retrieval
-- local and cloud LLM support
-- Streamlit UI
-- Docker production image
+```text
+http://localhost:8501
+```
 
-Stable current release:
-v2.3
+How to use it:
 
----
+- enter a cohort-style medical query
+- leave both LLM options unchecked for retrieval + structured summary only
+- enable `Use Groq cloud LLM` if `GROQ_API_KEY` is configured
+- enable `Use local LLM` to generate a local narrative with `Qwen/Qwen2.5-1.5B-Instruct`
 
-# Future Work
+### Terminal Mode
 
-## Cloud Deployment
+Run the terminal version:
 
-Planned deployment targets:
-- Railway
-- Docker cloud container hosting
+```powershell
+python src_v2/agent/main.py
+```
 
-Cloud work includes:
-- container secret management
-- persistent production hosting
-- cloud inference stability
+This mode prompts for a query, prints the structured cohort summary, and then runs the local Qwen rewriter.
 
----
+## First-Run Downloads
 
-## API Layer
+On the first run, the project may download model assets such as:
 
-Planned migration:
-- FastAPI backend
+- `sentence-transformers/all-MiniLM-L6-v2`
+- `Qwen/Qwen2.5-1.5B-Instruct` when local LLM mode is used
 
-This enables:
-- API-first serving
-- frontend separation
+If the models are already cached locally, later runs can reuse them.
 
----
+## Troubleshooting
 
-## Frontend Evolution
+- `ModuleNotFoundError`: make sure the virtual environment is activated and dependencies were installed.
+- `File not found` for parquet, numpy, or FAISS assets: verify the required files exist under `data/`.
+- Groq errors: confirm `.env` exists in the repository root and contains `GROQ_API_KEY`.
+- Slow first run: model downloads and initialization can take time.
+- High memory or CPU usage: leave local LLM disabled and use structured evidence only, or use Groq instead.
 
-Planned frontend:
-- React
+## Current Notes
 
-Possible later:
-- dashboard analytics
-- richer cohort visualizations
-
----
-
-## Retrieval Upgrades
-
-Future improvements:
-- stronger ranking logic
-- semantic reranking
-- query intent expansion
-
----
-
-## LLM Upgrades
-
-Future experiments:
-- stronger cloud models
-- prompt refinement
-- citation-safe cohort generation
-
----
-
-# Technology Stack
-
-- Python
-- DuckDB
-- FAISS
-- Sentence Transformers
-- Streamlit
-- Transformers
-- Groq API
-- Docker
-
----
-
-# Repository Structure
-
-app/
-src_v2/
-data/
-sql/
-scripts/
-
----
-
-# Development Philosophy
-
-The system was intentionally built incrementally:
-
-data engineering → retrieval → summarization → LLM → UI → Docker
-
-This preserves modularity and allows controlled upgrades.
-
----
-
-# Next Immediate Milestone
-
-Cloud deployment of Dockerized production container.
+- The Streamlit app is the primary entrypoint for this branch.
+- `src_v2` contains the active retrieval, summarization, and LLM code.
+- `src_v1` is retained as an older implementation for reference.
