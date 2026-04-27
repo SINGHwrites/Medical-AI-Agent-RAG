@@ -1,113 +1,149 @@
 # Medical AI Agent
 
-A production-oriented medical cohort retrieval and summarization system built from scratch using open-source Python tools.
+Production-oriented clinical cohort retrieval and summarization system built from scratch using structured medical data, hybrid retrieval, optional LLM reasoning, and Dockerized deployment.
 
-The project transforms large-scale structured clinical data into an interactive AI-assisted retrieval engine capable of cohort filtering, semantic similarity search, structured evidence summarization, optional LLM clinical narrative generation, and Dockerized production packaging.
+This project converts large synthetic clinical datasets into an interactive AI-assisted retrieval engine capable of:
+
+- cohort-level SQL filtering  
+- semantic patient retrieval  
+- structured medical evidence summarization  
+- optional LLM-generated cohort narratives  
+- local production container execution  
 
 ---
 
-# Project Objective
+# Current Status
 
-The goal of this system is to build a practical medical AI retrieval agent that can answer cohort-level medical questions such as:
+✅ Hybrid retrieval working  
+✅ Streamlit application working  
+✅ Optional local/cloud LLM working  
+✅ Docker image built and validated locally  
+✅ Deploy-safe dataset prepared  
 
-- obesity death
-- diabetes kidney elderly
-- hypertension readmitted
-- obesity ICU
+🔜 Next milestone: cloud deployment
+
+---
+
+# Problem This Project Solves
+
+Medical datasets are usually large, fragmented, and difficult to query interactively.
+
+This system allows natural cohort-style questions such as:
+
+- obesity death  
+- diabetes kidney elderly  
+- hypertension readmitted  
+- obesity icu  
 
 The agent retrieves matching patients, summarizes cohort evidence, and optionally generates concise clinical narratives.
 
 ---
 
-# End-to-End Architecture
+# Architecture
 
+Raw Clinical Tables  
+↓  
+Patient Summary Engineering  
+↓  
+DuckDB Cohort Retrieval  
+↓  
+FAISS Semantic Retrieval  
+↓  
+Structured Summary Builder  
+↓  
+Optional LLM Layer  
+↓  
+Streamlit Application  
+↓  
+Docker Production Container  
+↓  
+Cloud Deployment (next)
+
+---
+
+# Repository Structure
+
+```text
 medical-ai-agent/
-
-├── app/
-
-├── src_v2/
-
-├── data/
-
-├── sql/
-
-├── scripts/
-
-├── Dockerfile
+├── app/              # Streamlit interface  
+├── src_v2/           # Retrieval, summarization, LLM modules  
+├── scripts/          # Deploy dataset preparation scripts  
+├── sql/              # SQL profiling and cohort queries  
+├── data/             # summaries, deploy subsets, FAISS assets  
+├── Dockerfile        # production container  
+├── README.md  
+````
 
 ---
 
 # Phase 1 — Clinical Data Engineering
 
-Multiple synthetic medical tables were merged into one large unified dataset.
+Multiple synthetic medical tables were merged:
 
-Source tables:
-- patients
-- diagnoses
-- lab_results
-- medications
-- outcomes
+* patients
+* diagnoses
+* lab_results
+* medications
+* outcomes
 
-Initial merged dataset characteristics:
-- 33,919,890 rows
-- 64 columns
-- approximately 10 GB
+Initial full dataset:
 
-This stage focused on schema control, dtype optimization, and efficient storage design.
+* 33,919,890 rows
+* 64 columns
+* ~10 GB
 
----
+Main challenge:
 
-# Phase 2 — SQL Analytical Layer
-
-DuckDB was selected as the analytical engine because of its local speed and low setup overhead.
-
-Implemented SQL profiling:
-- row count
-- unique patients
-- null profile
-- diagnosis prevalence
-- lab prevalence
-- medication prevalence
-
-Custom SQL queries were created for medical cohort retrieval.
-
-Supported cohort filters:
-- obesity
-- hypertension
-- diabetes
-- chronic kidney disease
-- ICU admission
-- mortality
-- readmission
-- elderly population
+Large-scale schema handling for local analytical use.
 
 ---
 
-# Phase 3 — Patient Summary Construction
+# Phase 2 — SQL Cohort Retrieval Layer
 
-A patient-level summary table was created to compress row-level clinical data into retrieval-ready records.
+DuckDB is used for fast analytical retrieval.
+
+Supported cohort filters include:
+
+* obesity
+* hypertension
+* diabetes
+* chronic kidney disease
+* ICU admission
+* mortality
+* readmission
+* elderly
+
+DuckDB chosen because it enables local analytical performance without external database setup.
+
+---
+
+# Phase 3 — Patient Summary Layer
+
+Row-level data was compressed into patient-level summaries.
 
 Final summary columns:
-- patient_id
-- age
-- sex
-- bmi
-- smoking_status
-- alcohol_use
-- exercise_level
-- diagnoses
-- labs
-- medications
-- readmitted_30d
-- in_hospital_death
-- icu_admission
 
-Summary dataset size:
-- 100,000 patient summaries
+* patient_id
+* age
+* sex
+* bmi
+* smoking_status
+* alcohol_use
+* exercise_level
+* diagnoses
+* labs
+* medications
+* readmitted_30d
+* in_hospital_death
+* icu_admission
 
-Storage:
-- parquet
-- deploy-safe parquet subset
+Summary size:
+
+* 100,000 patient summaries
+
+Storage format:
+
+* parquet
 
 ---
 
@@ -115,212 +151,220 @@ Storage:
 
 Hybrid retrieval combines:
 
-## SQL retrieval
-Fast rule-based cohort filtering using DuckDB.
+## SQL Retrieval
 
-## Semantic retrieval
-Embedding-based similarity search using FAISS.
+Rule-based cohort filtering using DuckDB.
+
+## Semantic Retrieval
+
+FAISS nearest-neighbor search using embeddings.
 
 Embedding model:
+
 all-MiniLM-L6-v2
 
 Vector store:
+
 FAISS index
 
-Hybrid retrieval merges:
-- SQL matches
-- semantic nearest neighbors
+Hybrid output:
 
-Final result size:
-- top 100 patients
+* SQL cohort matches
+* semantic nearest neighbors
+* duplicate removal
+* top 100 final patients
 
 ---
 
-# Phase 5 — Structured Cohort Summarization
+# Phase 5 — Structured Summary Builder
 
-A summary builder converts retrieved patients into structured evidence.
+Retrieved patients are converted into deterministic cohort evidence.
 
 Output includes:
-- patient count
-- age range
-- top diagnoses
-- top labs
-- top medications
 
-This creates deterministic evidence before LLM generation.
+* patient count
+* age range
+* top diagnoses
+* top labs
+* top medications
+
+This stage prevents unsupported LLM generation.
 
 ---
 
 # Phase 6 — LLM Layer
 
-Two optional LLM modes were implemented.
+Two inference modes supported.
 
 ## Local LLM
+
 Qwen2.5-1.5B-Instruct
 
-Used for fully local inference.
+Advantages:
+
+* fully local
+* no API dependency
+
+Limitations:
+
+* slower on CPU
+
+---
 
 ## Cloud LLM
+
 Groq API
 
-Used for faster inference and lower local CPU load.
+Advantages:
 
-Cloud mode is recommended for production.
+* much faster inference
+* cleaner user interaction
+
+Current recommended production mode:
+
+Groq
 
 ---
 
 # Phase 7 — Streamlit Application
 
-Interactive application built using Streamlit.
+Interactive UI features:
 
-Features:
-- query input
-- structured evidence display
-- optional clinical narrative generation
-- retrieval timing
-- previous query persistence
-- CSV export
-- report export
-
-The application supports both local and cloud LLM selection.
+* medical query input
+* structured cohort evidence
+* optional LLM generation
+* live timing metrics
+* previous query persistence
+* CSV export
+* report export
 
 ---
 
-# Phase 8 — Deployment Dataset Engineering
+# Phase 8 — Deployment Dataset Optimization
 
-Full production dataset was too large for lightweight deployment.
+Full dataset was too large for lightweight deployment.
 
-A deploy-safe subset was created.
+Deploy subset created:
 
-Deploy subset:
-- 5000 patient rows
-- deploy parquet
-- deploy embeddings
-- deploy FAISS index
+* 5000 rows
+* reduced parquet
+* deploy embeddings
+* deploy FAISS index
 
 Purpose:
-- memory-safe container deployment
-- cloud demonstration
+
+Fit memory constraints during deployment.
 
 ---
 
 # Phase 9 — Docker Production Packaging
 
-Application was containerized using Docker.
+Dockerized with:
 
-Docker base:
 python:3.11-slim
 
-Container includes:
-- Streamlit app
-- retrieval engine
-- deploy dataset
-- cloud LLM integration
+Includes:
 
-## Build
+* Streamlit app
+* retrieval engine
+* deploy dataset
+* optional cloud LLM
 
+---
+
+# Docker Build
+
+```bash
 docker build -t medical-ai-agent .
+```
 
-## Run
+---
 
+# Docker Run
+
+```bash
 docker run -p 8501:8501 -e GROQ_API_KEY=YOUR_KEY medical-ai-agent
+```
+
+---
+
+# Docker Validation
 
 Validated locally:
-- retrieval works
-- LLM works
-- Streamlit works inside container
+
+✅ retrieval works
+✅ Streamlit works
+✅ Groq LLM works inside container
 
 ---
 
-# Current Technical Status
+# Current Tech Stack
 
-Completed:
-- local full retrieval system
-- hybrid retrieval
-- local and cloud LLM support
-- Streamlit UI
-- Docker production image
-
-Stable current release:
-v2.3
+* Python
+* DuckDB
+* FAISS
+* Sentence Transformers
+* Streamlit
+* Transformers
+* Groq API
+* Docker
 
 ---
 
-# Future Work
+# Active Branches
+
+main → full development history
+
+deploy-prod → deploy-safe production branch
+
+---
+
+# Next Work
 
 ## Cloud Deployment
 
-Planned deployment targets:
-- Railway
-- Docker cloud container hosting
+Planned targets:
 
-Cloud work includes:
-- container secret management
-- persistent production hosting
-- cloud inference stability
+* Railway
+* Docker cloud hosting
+
+Includes:
+
+* environment secret management
+* persistent cloud inference
+* production runtime validation
 
 ---
 
 ## API Layer
 
-Planned migration:
-- FastAPI backend
+Planned:
+
+FastAPI backend
 
 This enables:
-- API-first serving
-- frontend separation
+
+* API serving
+* frontend decoupling
 
 ---
 
 ## Frontend Evolution
 
-Planned frontend:
-- React
+Possible future:
 
-Possible later:
-- dashboard analytics
-- richer cohort visualizations
+* React frontend
+* richer cohort dashboards
 
 ---
 
-## Retrieval Upgrades
+## Retrieval Improvements
 
-Future improvements:
-- stronger ranking logic
-- semantic reranking
-- query intent expansion
+Future upgrades:
 
----
-
-## LLM Upgrades
-
-Future experiments:
-- stronger cloud models
-- prompt refinement
-- citation-safe cohort generation
-
----
-
-# Technology Stack
-
-- Python
-- DuckDB
-- FAISS
-- Sentence Transformers
-- Streamlit
-- Transformers
-- Groq API
-- Docker
-
----
-
-# Repository Structure
-
-app/
-src_v2/
-data/
-sql/
-scripts/
+* semantic reranking
+* better intent expansion
+* stronger retrieval ranking
 
 ---
 
@@ -330,10 +374,13 @@ The system was intentionally built incrementally:
 
 data engineering → retrieval → summarization → LLM → UI → Docker
 
-This preserves modularity and allows controlled upgrades.
+This keeps each layer independently testable and replaceable.
 
 ---
 
-# Next Immediate Milestone
+# Current Release
 
-Cloud deployment of Dockerized production container.
+v2.4
+
+```
+```
