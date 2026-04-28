@@ -19,8 +19,7 @@ This project converts large synthetic clinical datasets into an interactive AI-a
 ✅ Optional local/cloud LLM working  
 ✅ Docker image built and validated locally  
 ✅ Deploy-safe dataset prepared  
-
-🔜 Next milestone: cloud deployment
+✅ Cloud deployment 
 
 ---
 
@@ -382,5 +381,3 @@ This keeps each layer independently testable and replaceable.
 
 v2.4
 
-```
-```
